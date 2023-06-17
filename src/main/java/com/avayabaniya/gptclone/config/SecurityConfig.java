@@ -15,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 @Configuration
 @EnableWebSecurity
@@ -50,10 +51,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().disable()
                 .httpBasic().disable()
                 .authorizeRequests()
-                .antMatchers( "/", "/auth/**", "/oauth2/**", "/swagger-ui/**", "/v3/api-docs/**")
+                .antMatchers( "/", "/auth/**", "/login/**", "/oauth2/**", "/swagger-ui/**", "/v3/api-docs/**")
                 .permitAll()
                 .anyRequest()
-                .authenticated();
+                .authenticated()
+                .and()
+                .cors()
+                /*.and()
+                .oauth2Login()*/;
 
         //jwt authentication/authorization filter
         http.addFilterBefore(new JwtAuthFilter(this.jwtUtils, this.authUseDetailService), UsernamePasswordAuthenticationFilter.class);
@@ -65,6 +70,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+
+
 
 
 

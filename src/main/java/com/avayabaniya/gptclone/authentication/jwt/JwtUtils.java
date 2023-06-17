@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Base64;
 import java.util.Date;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -38,7 +39,7 @@ public class JwtUtils {
 
         //this.jwtExpirationMs = this.config.getJwtExpirationMs();
         //if (this.jwtExpirationMs == 0) {
-            this.jwtExpirationMs = 3600000; //1hr
+            this.jwtExpirationMs = 360000000; //1hr
        // }
 
         this.jwtSecret = this.config.getJwtSecret();
@@ -87,14 +88,30 @@ public class JwtUtils {
                 .getBody();
     }
 
+    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = getAllClaimsFromToken(token);
+        return claimsResolver.apply(claims);
+    }
+
+    public Date getExpirationDateFromToken(String token) {
+        return getClaimFromToken(token, Claims::getExpiration);
+    }
+
+    private Boolean isTokenExpired(String token) {
+        final Date expiration = getExpirationDateFromToken(token);
+        return expiration.before(new Date());
+    }
+
     public boolean validateJwtToken(String authToken) {
         try {
-            this.jwtSecret = this.config.getJwtSecret();
+
+            /*this.jwtSecret = this.config.getJwtSecret();
             if (this.jwtSecret == null) {
                 this.jwtSecret = "123";
             }
-            String encodedString = Base64.getEncoder().encodeToString(this.jwtSecret.getBytes());
-            return true;
+            String encodedString = Base64.getEncoder().encodeToString(this.jwtSecret.getBytes());*/
+            return (!isTokenExpired(authToken)); //at this point jwt is already decoded using secret key
+
         } catch (SignatureException e) {
             logger.error("Invalid JWT signature: {}", e.getMessage());
         } catch (MalformedJwtException e) {

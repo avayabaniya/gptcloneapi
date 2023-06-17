@@ -40,6 +40,6 @@ public class ChatDao {
     }
 
     public List<Chat> findAllChatByUser(ApiUser user) {
-        return this.chatRepository.findAllByUser(user);
+        return this.chatRepository.findAllByUserOrderByCreatedAtDesc(user);
     }
 }

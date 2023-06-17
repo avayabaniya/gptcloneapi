@@ -1,7 +1,9 @@
 package com.avayabaniya.gptclone.chat;
 
-import com.avayabaniya.gptclone.chat.model.Chat;
+import com.avayabaniya.gptclone.chat.request.ChatHistoryRequest;
 import com.avayabaniya.gptclone.chat.request.ChatRequest;
+import com.avayabaniya.gptclone.chat.response.ChatHistoryDto;
+import com.avayabaniya.gptclone.chat.response.ChatHistoryListResponse;
 import com.avayabaniya.gptclone.chat.response.ChatListResponse;
 import com.avayabaniya.gptclone.chat.response.ChatResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+//@CrossOrigin(origins = "http://localhost:5173/api", allowedHeaders = "*")
 @RestController
 @RequestMapping("/api/chat")
 public class ChatController {
@@ -36,5 +39,15 @@ public class ChatController {
     public ResponseEntity<List<ChatListResponse>> chatList() {
         List<ChatListResponse> response = this.chatService.getChatList();
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/list/history")
+    @Operation(security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<ChatHistoryListResponse> chatHistory(@RequestBody ChatHistoryRequest request) {
+
+        List<ChatHistoryDto> data = this.chatService.getChatHistory(request);
+        int count =  this.chatService.getChatHistoryCount(request);
+
+        return new ResponseEntity<>(new ChatHistoryListResponse(data, count), HttpStatus.OK);
     }
 }

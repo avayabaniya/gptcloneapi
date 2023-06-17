@@ -9,7 +9,9 @@ import com.avayabaniya.gptclone.chat.dao.ChatDao;
 import com.avayabaniya.gptclone.chat.dao.ChatHistoryDao;
 import com.avayabaniya.gptclone.chat.model.Chat;
 import com.avayabaniya.gptclone.chat.model.ChatHistory;
+import com.avayabaniya.gptclone.chat.request.ChatHistoryRequest;
 import com.avayabaniya.gptclone.chat.request.ChatRequest;
+import com.avayabaniya.gptclone.chat.response.ChatHistoryDto;
 import com.avayabaniya.gptclone.chat.response.ChatListResponse;
 import com.avayabaniya.gptclone.chat.response.ChatResponse;
 import com.avayabaniya.gptclone.config.AppPropertiesConfig;
@@ -91,5 +93,33 @@ public class ChatService {
                 .stream()
                 .map(ChatListResponse::new)
                 .collect(Collectors.toList());
+    }
+
+    public List<ChatHistoryDto> getChatHistory(ChatHistoryRequest request) {
+
+        AuthUserDetails authUserDetails = (AuthUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        ApiUser user = authUserDetails.getApiUser();
+
+        Chat chat = this.chatDao.findChatByChatIdAndUser(request.getChatId(), user)
+                .orElseThrow(() -> new RuntimeException("Invalid chat id"));
+
+        int limit = request.getLimit() == null ? 20 : request.getLimit();
+        return this.chatHistoryDao.findAllChatHistory(chat, request.getSkip(), limit)
+                .stream()
+                //.limit(limit)
+                //.skip(request.getSkip())
+                .map(ChatHistoryDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public int getChatHistoryCount(ChatHistoryRequest request) {
+        AuthUserDetails authUserDetails = (AuthUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        ApiUser user = authUserDetails.getApiUser();
+
+        Chat chat = this.chatDao.findChatByChatIdAndUser(request.getChatId(), user)
+                .orElseThrow(() -> new RuntimeException("Invalid chat id"));
+
+
+        return this.chatHistoryDao.countChatHistory(chat);
     }
 }

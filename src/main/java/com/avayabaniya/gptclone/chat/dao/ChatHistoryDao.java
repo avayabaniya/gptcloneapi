@@ -8,6 +8,8 @@ import com.avayabaniya.gptclone.chat.request.ChatRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class ChatHistoryDao {
 
@@ -35,5 +37,15 @@ public class ChatHistoryDao {
         chatHistory.setResponseStatus("1");
 
         return this.chatHistoryRepository.save(chatHistory);
+    }
+
+
+    public List<ChatHistory> findAllChatHistory(Chat chat, int skip, int limit) {
+        //return this.chatHistoryRepository.findAllByChat(chat);
+        return this.chatHistoryRepository.findAllByChatIdWithLimit(chat, skip, limit);
+    }
+
+    public int countChatHistory(Chat chat) {
+        return this.chatHistoryRepository.countByChat(chat);
     }
 }
