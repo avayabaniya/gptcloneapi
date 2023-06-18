@@ -41,4 +41,16 @@ public class AppPropertiesConfig {
         return this.getProperty("openapi.clientid");
     }
 
+    public String getGoogleCallbackUrl() {
+        return this.getProperty("google.callback.url");
+    }
+
+    public String getGoogleClientSecret() {
+        return this.getProperty("spring.security.oauth2.client.registration.google.client-secret");
+    }
+
+    public String getGoogleClientId() {
+        return this.getProperty("spring.security.oauth2.client.registration.google.client-id");
+    }
+
 }

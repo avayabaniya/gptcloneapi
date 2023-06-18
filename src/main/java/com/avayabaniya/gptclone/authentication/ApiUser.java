@@ -32,6 +32,10 @@ public class ApiUser implements Serializable {
 
     private String role;
 
+    private String picture;
+
+    private String name;
+
     @Column(name = "auth_type")
     private String authType;
 

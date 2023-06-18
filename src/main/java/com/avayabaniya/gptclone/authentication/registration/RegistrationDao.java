@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class RegistrationDao {
 
@@ -23,10 +25,20 @@ public class RegistrationDao {
     public ApiUser createUser(RegistrationRequest request, ApiUser apiUser, String authType) {
         apiUser.setUsername(request.getUsername());
         apiUser.setEmail(request.getEmail());
-        apiUser.setPassword(encoder.encode(request.getPassword()));
+
+        if (request.getPassword() != null) {
+            apiUser.setPassword(encoder.encode(request.getPassword()));
+        }
+
         apiUser.setAuthType(authType);
         apiUser.setRole("USER");
+        apiUser.setPicture(request.getPicture());
+        apiUser.setName(request.getName());
 
         return this.apiUserRepository.save(apiUser);
+    }
+
+    public Optional<ApiUser> getApiUser(String email) {
+        return this.apiUserRepository.findByEmail(email);
     }
 }

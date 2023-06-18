@@ -1,0 +1,56 @@
+version: '3'
+
+networks:
+  spring-boot-mysql-network:
+    driver: bridge
+
+services:
+  mysql:
+    image: mysql:8.0.32
+    container_name: mysql_gpt
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3007:3306"
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: gpt
+      MYSQL_USER: gpt
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: secret
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    networks:
+      - spring-boot-mysql-network
+
+  web-service:
+    platform: linux/amd64
+    environment:
+      TZ: "Asia/Kathmandu"
+    container_name: gpt
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "8008:80"
+    volumes:
+      - ./logs:/logs:delegated
+    networks:
+      - spring-boot-mysql-network
+    depends_on:
+      - mysql
+
+  phpmyadmin:
+    depends_on:
+      - mysql
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin_gpt
+    restart: always
+    ports:
+      - 8007:80
+    environment:
+      PMA_HOST: mysql_gpt
+      MYSQL_ROOT_PASSWORD: secret
+    networks:
+      - spring-boot-mysql-network

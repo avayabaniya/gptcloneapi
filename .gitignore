@@ -33,3 +33,6 @@ build/
 .vscode/
 
 *.properties
+
+mysql
+/src/main/resources/application.properties
